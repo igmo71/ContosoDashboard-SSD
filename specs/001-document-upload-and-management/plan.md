@@ -1,0 +1,122 @@
+# Implementation Plan: [FEATURE]
+
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+
+**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+
+## Summary
+
+[Extract from feature spec: primary requirement + technical approach from research]
+
+## Technical Context
+
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+
+## Constitution Check
+
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+
+[Gates determined based on constitution file]
+
+## Project Structure
+
+### Documentation (this feature)
+
+```text
+specs/[###-feature]/
+├── plan.md              # This file (/speckit.plan command output)
+├── research.md          # Phase 0 output (/speckit.plan command)
+├── data-model.md        # Phase 1 output (/speckit.plan command)
+├── quickstart.md        # Phase 1 output (/speckit.plan command)
+├── contracts/           # Phase 1 output (/speckit.plan command)
+└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+```
+
+# Implementation Plan: Document Upload and Management
+
+**Branch**: `001-document-upload-and-management` | **Date**: 2026-06-03 | **Spec**: [spec.md](spec.md)
+
+## Summary
+
+Provide document upload, storage, discovery, and sharing capabilities within the ContosoDashboard training application. The feature will store files on the local filesystem (outside `wwwroot`), persist metadata in the existing EF Core database, and expose secure download/preview endpoints. The implementation will be offline-first and designed with an `IFileStorageService` abstraction to enable future migration to Azure Blob Storage.
+
+## Technical Context
+
+**Language/Version**: C# / .NET 10.0  
+**Primary Dependencies**: ASP.NET Core 8+/10 runtime, Blazor Server, Entity Framework Core (SQLite), Microsoft.Identity.Web (UI present, but training uses mock auth), Bootstrap 5  
+**Storage**: EF Core with SQLite for metadata; local filesystem for file storage (configurable via `IFileStorageService`)  
+**Testing**: Unit tests (xUnit), integration tests for upload/download flows, manual acceptance tests for UI flows  
+**Target Platform**: Windows development machines (local), Blazor Server hosting model  
+**Project Type**: Web application (Blazor Server)  
+**Performance Goals**: Uploads under 30s for 25MB; list and search <2s for 500 documents; preview <3s for common types  
+**Constraints**: Offline-first operation, store files outside `wwwroot`, integer `DocumentId` primary key, category stored as text  
+
+## Constitution Check
+
+Conforms to project constitution: training-first delivery, security-aware training, and spec-driven workflow. No constitution gates violated.
+
+## Project Structure
+
+### Documentation (feature)
+
+```text
+specs/001-document-upload-and-management/
+├── spec.md
+├── plan.md        # this file
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+└── tasks.md       # created by /speckit.tasks
+```
+
+### Source Changes
+
+Additions/modifications under `ContosoDashboard/`:
+- `Data/Document.cs` (entity)
+- `Data/DocumentShare.cs` (entity)
+- `Services/IFileStorageService.cs`
+- `Services/LocalFileStorageService.cs`
+- `Services/DocumentService.cs`
+- `Pages/Documents.razor`, `Pages/DocumentDetails.razor`
+- `Controllers/FilesController.cs` (to serve files securely)
+
+## Phase 0: Research (outputs)
+
+- `research.md` — decisions: local storage, SQLite, deferred malware scanning, integer DocumentId, storage path pattern `{userId}/{projectId|personal}/{guid}.{ext}`
+
+## Phase 1: Design & Contracts
+
+1. Create `data-model.md` describing entities and fields (document, documentshare, tags, activity)  
+2. Define API contract for file download/preview endpoints in `/contracts/`  
+3. Create `quickstart.md` with local setup instructions and storage path configuration
+
+## Phase 2: Tasks (to be generated by `/speckit.tasks`)
+
+Foundational tasks include:
+- Implement `IFileStorageService` and `LocalFileStorageService`  
+- Add `Document` and related entities to `ApplicationDbContext` and create migration scaffolding  
+- Implement `DocumentService` for upload workflow (validate, authorize, save file, persist metadata, send notifications)  
+- Add Blazor pages and upload UI component using `InputFile` patterns  
+- Implement `FilesController` with authorization checks for secure file serving
+
+## Next steps
+
+1. Generate `research.md`, `data-model.md`, and `quickstart.md`.  
+2. Run `/speckit.tasks` to produce `tasks.md`.  
+3. Implement foundational services and entities.
