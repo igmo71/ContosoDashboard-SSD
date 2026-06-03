@@ -1,0 +1,138 @@
+@page "/documents"
+@using System.Net.Http.Headers
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Forms
+@using ContosoDashboard.Data
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@inject IDocumentService DocumentService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>My Documents</h3>
+
+@if (documents == null)
+{
+    <p>Loading documents...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label class="form-label">Choose a document</label>
+        <InputFile OnChange="OnInputFileChange" />
+    </div>
+    <div class="mb-3">
+        <input class="form-control mb-2" placeholder="Title" @bind="Title" />
+        <input class="form-control mb-2" placeholder="Category" @bind="Category" />
+        <button class="btn btn-primary" @onclick="Upload">Upload</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="alert alert-info">@Message</div>
+    }
+
+    <h4>Uploaded documents</h4>
+    @if (!documents.Any())
+    {
+        <p>No documents uploaded yet.</p>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Uploaded</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var doc in documents)
+                {
+                    <tr>
+                        <td>@doc.Title</td>
+                        <td>@doc.Category</td>
+                        <td>@doc.UploadDate.ToLocalTime().ToString("g")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private IBrowserFile? selectedFile;
+    private string Title = string.Empty;
+    private string Category = "General";
+    private string? Message;
+    private List<Document>? documents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDocumentsAsync();
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        Message = null;
+    }
+
+    private async Task Upload()
+    {
+        if (selectedFile == null)
+        {
+            Message = "Please select a file before uploading.";
+            return;
+        }
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(NavigationManager.BaseUri);
+
+            using var content = new MultipartFormDataContent();
+            var streamContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 50));
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue(selectedFile.ContentType ?? "application/octet-stream");
+            content.Add(streamContent, "file", selectedFile.Name);
+            content.Add(new StringContent(string.IsNullOrWhiteSpace(Title) ? selectedFile.Name : Title), "title");
+            content.Add(new StringContent(Category), "category");
+
+            var response = await client.PostAsync("api/files/upload", content);
+            if (response.IsSuccessStatusCode)
+            {
+                Message = "Upload completed successfully.";
+                await LoadDocumentsAsync();
+            }
+            else
+            {
+                var text = await response.Content.ReadAsStringAsync();
+                Message = $"Upload failed: {response.ReasonPhrase}. {text}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Upload error: {ex.Message}";
+        }
+    }
+
+    private async Task LoadDocumentsAsync()
+    {
+        documents = new List<Document>();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+            if (int.TryParse(idClaim?.Value, out var userId))
+            {
+                documents = (await DocumentService.SearchAsync(uploaderUserId: userId)).ToList();
+            }
+        }
+        else
+        {
+            Message = "You must be logged in to see documents.";
+        }
+    }
+}

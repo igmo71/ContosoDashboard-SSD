@@ -1,0 +1,11 @@
+@page "/documents/{Id:int}"
+@inject HttpClient Http
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private string? DownloadUrl => $"/api/files/{Id}";
+}
+
+<h3>Document Details</h3>
+
+<a href="@DownloadUrl">Download</a>

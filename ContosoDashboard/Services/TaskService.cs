@@ -190,7 +190,7 @@ public class TaskService : ITaskService
             .ThenInclude(p => p.ProjectMembers)
             .FirstOrDefaultAsync(t => t.TaskId == taskId);
 
-        if (task == null) return new List<TaskComment>();
+        if (task == null) return [];
 
         // Authorization: User can only view comments if they have access to the task
         var isAssignedUser = task.AssignedUserId == requestingUserId;
