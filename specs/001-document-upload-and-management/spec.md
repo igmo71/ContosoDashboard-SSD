@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: `--file StakeholderDocs/document-upload-and-management-feature.md`
 
+## Clarifications
+
+### Session 2026-06-03
+- Q: Should the training implementation include a local virus/malware scanning step before storage? → A: Option B - Defer scanning to future/production.
+
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Upload and manage personal and project documents (Priority: P1)
@@ -82,10 +88,12 @@ Task and dashboard pages surface related documents and recent uploads so users c
 - **FR-016**: The system MUST support previewing common file types in the browser without requiring download.
 - **FR-017**: The system MUST log uploads, downloads, deletions, shares, and metadata edits for audit and reporting.
 - **FR-018**: The system MUST operate using local filesystem storage for training/offline use while allowing a future storage abstraction for cloud migration.
+ - **FR-019**: Virus/malware scanning is OUT OF SCOPE for the training implementation and will be planned for production migration; scanning requirements must be added to the implementation plan for production deployments.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Document**: Represents an uploaded file, including title, description, category, tags, associated project, uploader, upload timestamp, file size, MIME type, storage path, and status.
+	- **DocumentId**: Integer primary key (consistent with existing `User` and `Project` integer keys).
 - **DocumentShare**: Tracks which users or teams a document has been explicitly shared with and the associated access grant.
 - **DocumentCategory**: Represents a named category value such as `Project Documents`, `Team Resources`, `Personal Files`, `Reports`, `Presentations`, or `Other`.
 - **DocumentTag**: Represents custom tags attached to a document to support search and filtering.
