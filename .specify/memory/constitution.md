@@ -1,50 +1,61 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: uninitialized → 1.0.0
+Modified principles: placeholders → Training-first delivery; Security-aware training; Spec-driven workflow; Simple, portable architecture; Documentation and alignment
+Added sections: Development Constraints; Development Workflow
+Removed sections: none
+Templates reviewed: ✅ .specify/templates/plan-template.md (reviewed), ✅ .specify/templates/spec-template.md (reviewed), ✅ .specify/templates/tasks-template.md (reviewed), ✅ .specify/templates/constitution-template.md (source template)
+Follow-up TODOs: none
+-->
+
+# ContosoDashboard Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Training-first delivery
+ContosoDashboard exists first as a training artifact. Every implementation decision must preserve offline availability,
+clear learning value, and mock-friendly architecture rather than production-ready complexity.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Security-aware training
+Security practices are demonstrated with explicit caveats: authorization and service-level checks MUST be implemented,
+but mock authentication and local-only infrastructure are acceptable for the training scope.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Spec-driven workflow
+All feature work MUST follow the GitHub Spec Kit workflow: define specifications, produce a plan, generate tasks,
+and implement only after the plan and task artifacts align with the constitution.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Simple, portable architecture
+The codebase MUST favor simplicity, separation of concerns, and portability. Infrastructure abstractions should be used
+where they enable migration paths, but the current implementation must remain easy to understand and run locally.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Documentation and alignment
+Documentation, guidance, and project metadata MUST reflect the actual implementation and training purpose.
+Artifacts such as README.md, templates, and Spec Kit documents MUST stay synchronized with the repository's design.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Constraints
+The project is constrained to training-oriented, offline-capable development:
+- Use local-first infrastructure by default.
+- Explicitly label mock or placeholder implementations as training-specific.
+- Avoid introducing production-only cloud services or external service dependencies without a documented migration path.
+- Preserve the pedagogical structure of the app so students can trace feature behavior from spec to implementation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Development Workflow
+The repository uses a Spec Kit workflow with clearly defined artifacts and gates:
+- `/speckit.specify` sets the feature spec.
+- `/speckit.plan` produces a technical plan and a constitution check.
+- `/speckit.tasks` generates dependency-ordered tasks for implementation.
+- `/speckit.implement` carries out work only after the above artifacts exist and comply with the constitution.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Code review and change approval MUST validate that work remains aligned with these principles, especially when updates touch security,
+training assumptions, or platform/runtime configuration.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution is the authoritative source for project-level guidance and supersedes informal or undocumented practices.
+Amendments require an explicit update to this document and a review of dependent Spec Kit artifacts to ensure consistency.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- All PRs and reviews MUST verify that changes remain compatible with the constitution.
+- Major architectural deviations or production migration changes REQUIRE a constitution amendment.
+- Training-specific shortcuts and mock implementations MUST be clearly documented and not silently preserved as production behavior.
+- Cross-artifact consistency MUST be maintained between constitution, plan, spec, tasks, and runtime guidance.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-06-03 | **Last Amended**: 2026-06-03
